@@ -24,7 +24,6 @@ books = [
 
 
 def show_books(book_list):
-    """Выводит информацию о книгах."""
     print("\nКаталог книг:")
 
     if not book_list:
@@ -41,7 +40,6 @@ def show_books(book_list):
 
 
 def search_books(book_list, query):
-    """Ищет книги по названию или автору."""
     result = []
 
     for book in book_list:
@@ -54,8 +52,7 @@ def search_books(book_list, query):
     return result
 
 
-def add_book(book_list, title, author, year, status="Доступна"):
-    """Добавляет новую книгу и возвращает её."""
+def add_book(book_list, title, author, year):
     new_id = max([book["id"] for book in book_list], default=0) + 1
 
     book = {
@@ -63,94 +60,167 @@ def add_book(book_list, title, author, year, status="Доступна"):
         "title": title,
         "author": author,
         "year": year,
-        "status": status
+        "status": "Доступна"
     }
 
     book_list.append(book)
-    return book
+    print("Книга успешно добавлена.")
 
 
 def delete_book(book_list, book_id):
-    """Удаляет книгу по ID и возвращает результат."""
     for book in book_list:
         if book["id"] == book_id:
             book_list.remove(book)
+            print("Книга удалена.")
             return True
 
+    print("Книга с таким ID не найдена.")
     return False
 
 
 def change_status(book_list, book_id, new_status):
-    """Изменяет статус книги."""
     for book in book_list:
         if book["id"] == book_id:
             book["status"] = new_status
+            print("Статус книги изменён.")
             return True
 
+    print("Книга с таким ID не найдена.")
     return False
 
 
-def can_perform_action(role, action):
-    """Проверяет права пользователя."""
-    reader_actions = ["view", "search"]
+def reader_menu():
+    while True:
+        print("\n===== Меню читателя =====")
+        print("1. Показать каталог")
+        print("2. Найти книгу")
+        print("0. Выйти")
 
-    if role == "Библиотекарь":
-        return True
+        choice = input("Выберите действие: ")
 
-    if role == "Читатель" and action in reader_actions:
-        return True
+        if choice == "1":
+            show_books(books)
 
-    return False
+        elif choice == "2":
+            query = input("Введите название или автора: ").strip()
+
+            if not query:
+                print("Ошибка: поисковый запрос не может быть пустым.")
+                continue
+
+            result = search_books(books, query)
+            show_books(result)
+
+        elif choice == "0":
+            print("Выход из меню читателя.")
+            break
+
+        else:
+            print("Ошибка: такого пункта меню нет.")
+
+
+def librarian_menu():
+    while True:
+        print("\n===== Меню библиотекаря =====")
+        print("1. Показать каталог")
+        print("2. Найти книгу")
+        print("3. Добавить книгу")
+        print("4. Удалить книгу")
+        print("5. Изменить статус книги")
+        print("0. Выйти")
+
+        choice = input("Выберите действие: ")
+
+        if choice == "1":
+            show_books(books)
+
+        elif choice == "2":
+            query = input("Введите название или автора: ").strip()
+
+            if not query:
+                print("Ошибка: поисковый запрос не может быть пустым.")
+                continue
+
+            result = search_books(books, query)
+            show_books(result)
+
+        elif choice == "3":
+            title = input("Введите название книги: ").strip()
+            author = input("Введите автора: ").strip()
+            year_input = input("Введите год издания: ").strip()
+
+            if not title or not author:
+                print("Ошибка: название и автор не могут быть пустыми.")
+                continue
+
+            if not year_input.isdigit():
+                print("Ошибка: год должен быть числом.")
+                continue
+
+            year = int(year_input)
+            add_book(books, title, author, year)
+
+        elif choice == "4":
+            book_id_input = input("Введите ID книги: ").strip()
+
+            if not book_id_input.isdigit():
+                print("Ошибка: ID должен быть числом.")
+                continue
+
+            book_id = int(book_id_input)
+            delete_book(books, book_id)
+
+        elif choice == "5":
+            book_id_input = input("Введите ID книги: ").strip()
+
+            if not book_id_input.isdigit():
+                print("Ошибка: ID должен быть числом.")
+                continue
+
+            book_id = int(book_id_input)
+
+            print("1. Доступна")
+            print("2. Выдана")
+
+            status_choice = input("Выберите новый статус: ")
+
+            if status_choice == "1":
+                change_status(books, book_id, "Доступна")
+
+            elif status_choice == "2":
+                change_status(books, book_id, "Выдана")
+
+            else:
+                print("Ошибка: такого статуса нет.")
+
+        elif choice == "0":
+            print("Выход из меню библиотекаря.")
+            break
+
+        else:
+            print("Ошибка: такого пункта меню нет.")
 
 
 print("Каталог книг в библиотеке")
 print("Проект программной инженерии")
 
+while True:
+    print("\n===== Выбор роли =====")
+    print("1. Читатель")
+    print("2. Библиотекарь")
+    print("0. Выход")
 
-print("\n===== Набор данных 1: Читатель =====")
+    role = input("Выберите роль: ")
 
-reader_role = "Читатель"
+    if role == "1":
+        reader_menu()
 
-if can_perform_action(reader_role, "view"):
-    show_books(books)
+    elif role == "2":
+        librarian_menu()
 
-if can_perform_action(reader_role, "search"):
-    found_books = search_books(books, "Толстой")
-    print("\nРезультат поиска по запросу «Толстой»:")
-    show_books(found_books)
+    elif role == "0":
+        print("Программа завершена.")
+        break
 
-if not can_perform_action(reader_role, "delete"):
-    print("\nЧитателю запрещено удалять книги.")
-
-
-print("\n===== Набор данных 2: Поиск =====")
-
-search_result = search_books(books, "Булгаков")
-print("\nРезультат поиска по запросу «Булгаков»:")
-show_books(search_result)
-
-
-print("\n===== Набор данных 3: Библиотекарь =====")
-
-librarian_role = "Библиотекарь"
-
-if can_perform_action(librarian_role, "add"):
-    new_book = add_book(
-        books,
-        "Гарри Поттер",
-        "Джоан Роулинг",
-        1997
-    )
-    print(f"Добавлена книга: {new_book['title']}")
-
-if can_perform_action(librarian_role, "status"):
-    if change_status(books, 1, "Выдана"):
-        print("Статус книги с ID 1 изменён.")
-
-if can_perform_action(librarian_role, "delete"):
-    if delete_book(books, 2):
-        print("Книга с ID 2 удалена.")
-
-
-print("\n===== Итоговый каталог =====")
-show_books(books)
+    else:
+        print("Ошибка: необходимо выбрать 1, 2 или 0.")
