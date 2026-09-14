@@ -1,92 +1,115 @@
-books = [
-    {
-        "id": 1,
-        "title": "Мастер и Маргарита",
-        "author": "Михаил Булгаков",
-        "year": 1967,
-        "status": "Доступна"
-    },
-    {
-        "id": 2,
-        "title": "Преступление и наказание",
-        "author": "Фёдор Достоевский",
-        "year": 1866,
-        "status": "Выдана"
-    },
-    {
-        "id": 3,
-        "title": "Война и мир",
-        "author": "Лев Толстой",
-        "year": 1869,
-        "status": "Доступна"
-    }
-]
+class Book:
+    def __init__(self, book_id, title, author, year, status):
+        self.id = book_id
+        self.title = title
+        self.author = author
+        self.year = year
+        self.status = status
+
+    def change_status(self, new_status):
+        self.status = new_status
 
 
-def show_books(book_list):
-    print("\nКаталог книг:")
+class Library:
+    def __init__(self):
+        self.books = []
 
-    if not book_list:
-        print("Книги не найдены.")
-        return
+    def add_book(self, title, author, year):
+        new_id = max([book.id for book in self.books], default=0) + 1
 
-    for book in book_list:
-        print(
-            f"ID: {book['id']} | "
-            f"{book['title']} — {book['author']} | "
-            f"{book['year']} | "
-            f"Статус: {book['status']}"
+        book = Book(
+            new_id,
+            title,
+            author,
+            year,
+            "Доступна"
         )
 
+        self.books.append(book)
+        print("Книга успешно добавлена.")
 
-def search_books(book_list, query):
-    result = []
+    def show_books(self, book_list=None):
+        if book_list is None:
+            book_list = self.books
 
-    for book in book_list:
-        if (
-            query.lower() in book["title"].lower()
-            or query.lower() in book["author"].lower()
-        ):
-            result.append(book)
+        print("\nКаталог книг:")
 
-    return result
+        if not book_list:
+            print("Книги не найдены.")
+            return
+
+        for book in book_list:
+            print(
+                f"ID: {book.id} | "
+                f"{book.title} — {book.author} | "
+                f"{book.year} | "
+                f"Статус: {book.status}"
+            )
+
+    def search_books(self, query):
+        result = []
+
+        for book in self.books:
+            if (
+                query.lower() in book.title.lower()
+                or query.lower() in book.author.lower()
+            ):
+                result.append(book)
+
+        return result
+
+    def delete_book(self, book_id):
+        for book in self.books:
+            if book.id == book_id:
+                self.books.remove(book)
+                print("Книга удалена.")
+                return True
+
+        print("Книга с таким ID не найдена.")
+        return False
+
+    def change_status(self, book_id, new_status):
+        for book in self.books:
+            if book.id == book_id:
+                book.change_status(new_status)
+                print("Статус книги изменён.")
+                return True
+
+        print("Книга с таким ID не найдена.")
+        return False
 
 
-def add_book(book_list, title, author, year):
-    new_id = max([book["id"] for book in book_list], default=0) + 1
+library = Library()
 
-    book = {
-        "id": new_id,
-        "title": title,
-        "author": author,
-        "year": year,
-        "status": "Доступна"
-    }
+library.books.append(
+    Book(
+        1,
+        "Мастер и Маргарита",
+        "Михаил Булгаков",
+        1967,
+        "Доступна"
+    )
+)
 
-    book_list.append(book)
-    print("Книга успешно добавлена.")
+library.books.append(
+    Book(
+        2,
+        "Преступление и наказание",
+        "Фёдор Достоевский",
+        1866,
+        "Выдана"
+    )
+)
 
-
-def delete_book(book_list, book_id):
-    for book in book_list:
-        if book["id"] == book_id:
-            book_list.remove(book)
-            print("Книга удалена.")
-            return True
-
-    print("Книга с таким ID не найдена.")
-    return False
-
-
-def change_status(book_list, book_id, new_status):
-    for book in book_list:
-        if book["id"] == book_id:
-            book["status"] = new_status
-            print("Статус книги изменён.")
-            return True
-
-    print("Книга с таким ID не найдена.")
-    return False
+library.books.append(
+    Book(
+        3,
+        "Война и мир",
+        "Лев Толстой",
+        1869,
+        "Доступна"
+    )
+)
 
 
 def reader_menu():
@@ -99,7 +122,7 @@ def reader_menu():
         choice = input("Выберите действие: ")
 
         if choice == "1":
-            show_books(books)
+            library.show_books()
 
         elif choice == "2":
             query = input("Введите название или автора: ").strip()
@@ -108,8 +131,8 @@ def reader_menu():
                 print("Ошибка: поисковый запрос не может быть пустым.")
                 continue
 
-            result = search_books(books, query)
-            show_books(result)
+            result = library.search_books(query)
+            library.show_books(result)
 
         elif choice == "0":
             print("Выход из меню читателя.")
@@ -132,7 +155,7 @@ def librarian_menu():
         choice = input("Выберите действие: ")
 
         if choice == "1":
-            show_books(books)
+            library.show_books()
 
         elif choice == "2":
             query = input("Введите название или автора: ").strip()
@@ -141,8 +164,8 @@ def librarian_menu():
                 print("Ошибка: поисковый запрос не может быть пустым.")
                 continue
 
-            result = search_books(books, query)
-            show_books(result)
+            result = library.search_books(query)
+            library.show_books(result)
 
         elif choice == "3":
             title = input("Введите название книги: ").strip()
@@ -158,7 +181,7 @@ def librarian_menu():
                 continue
 
             year = int(year_input)
-            add_book(books, title, author, year)
+            library.add_book(title, author, year)
 
         elif choice == "4":
             book_id_input = input("Введите ID книги: ").strip()
@@ -168,7 +191,7 @@ def librarian_menu():
                 continue
 
             book_id = int(book_id_input)
-            delete_book(books, book_id)
+            library.delete_book(book_id)
 
         elif choice == "5":
             book_id_input = input("Введите ID книги: ").strip()
@@ -185,10 +208,10 @@ def librarian_menu():
             status_choice = input("Выберите новый статус: ")
 
             if status_choice == "1":
-                change_status(books, book_id, "Доступна")
+                library.change_status(book_id, "Доступна")
 
             elif status_choice == "2":
-                change_status(books, book_id, "Выдана")
+                library.change_status(book_id, "Выдана")
 
             else:
                 print("Ошибка: такого статуса нет.")
