@@ -9,20 +9,47 @@ class Book:
     def change_status(self, new_status):
         self.status = new_status
 
+    def show_info(self):
+        print(
+            f"ID: {self.id} | "
+            f"{self.title} — {self.author} | "
+            f"{self.year} | "
+            f"Статус: {self.status}"
+        )
+
+
+class PrintedBook(Book):
+    def __init__(self, book_id, title, author, year, status, pages):
+        super().__init__(book_id, title, author, year, status)
+        self.pages = pages
+
+    def show_format(self):
+        print(f"Тип: Печатная книга | Страниц: {self.pages}")
+
+
+class ElectronicBook(Book):
+    def __init__(self, book_id, title, author, year, status, file_format):
+        super().__init__(book_id, title, author, year, status)
+        self.file_format = file_format
+
+    def show_format(self):
+        print(f"Тип: Электронная книга | Формат: {self.file_format}")
+
 
 class Library:
     def __init__(self):
         self.books = []
 
-    def add_book(self, title, author, year):
+    def add_book(self, title, author, year, pages):
         new_id = max([book.id for book in self.books], default=0) + 1
 
-        book = Book(
+        book = PrintedBook(
             new_id,
             title,
             author,
             year,
-            "Доступна"
+            "Доступна",
+            pages
         )
 
         self.books.append(book)
@@ -39,12 +66,7 @@ class Library:
             return
 
         for book in book_list:
-            print(
-                f"ID: {book.id} | "
-                f"{book.title} — {book.author} | "
-                f"{book.year} | "
-                f"Статус: {book.status}"
-            )
+            book.show_info()
 
     def search_books(self, query):
         result = []
@@ -82,34 +104,49 @@ class Library:
 library = Library()
 
 library.books.append(
-    Book(
+    PrintedBook(
         1,
         "Мастер и Маргарита",
         "Михаил Булгаков",
         1967,
-        "Доступна"
+        "Доступна",
+        480
     )
 )
 
 library.books.append(
-    Book(
+    PrintedBook(
         2,
         "Преступление и наказание",
         "Фёдор Достоевский",
         1866,
-        "Выдана"
+        "Выдана",
+        672
     )
 )
 
 library.books.append(
-    Book(
+    ElectronicBook(
         3,
         "Война и мир",
         "Лев Толстой",
         1869,
-        "Доступна"
+        "Доступна",
+        "EPUB"
     )
 )
+
+
+def show_inheritance_demo():
+    print("\n===== Демонстрация наследования =====")
+
+    for book in library.books:
+        print(f"\nНазвание: {book.title}")
+        print(f"Автор: {book.author}")
+        print(f"Год: {book.year}")
+        print(f"Статус: {book.status}")
+
+        book.show_format()
 
 
 def reader_menu():
@@ -117,6 +154,7 @@ def reader_menu():
         print("\n===== Меню читателя =====")
         print("1. Показать каталог")
         print("2. Найти книгу")
+        print("3. Показать типы книг")
         print("0. Выйти")
 
         choice = input("Выберите действие: ")
@@ -134,6 +172,9 @@ def reader_menu():
             result = library.search_books(query)
             library.show_books(result)
 
+        elif choice == "3":
+            show_inheritance_demo()
+
         elif choice == "0":
             print("Выход из меню читателя.")
             break
@@ -150,6 +191,7 @@ def librarian_menu():
         print("3. Добавить книгу")
         print("4. Удалить книгу")
         print("5. Изменить статус книги")
+        print("6. Показать типы книг")
         print("0. Выйти")
 
         choice = input("Выберите действие: ")
@@ -171,6 +213,7 @@ def librarian_menu():
             title = input("Введите название книги: ").strip()
             author = input("Введите автора: ").strip()
             year_input = input("Введите год издания: ").strip()
+            pages_input = input("Введите количество страниц: ").strip()
 
             if not title or not author:
                 print("Ошибка: название и автор не могут быть пустыми.")
@@ -180,8 +223,14 @@ def librarian_menu():
                 print("Ошибка: год должен быть числом.")
                 continue
 
+            if not pages_input.isdigit():
+                print("Ошибка: количество страниц должно быть числом.")
+                continue
+
             year = int(year_input)
-            library.add_book(title, author, year)
+            pages = int(pages_input)
+
+            library.add_book(title, author, year, pages)
 
         elif choice == "4":
             book_id_input = input("Введите ID книги: ").strip()
@@ -215,6 +264,9 @@ def librarian_menu():
 
             else:
                 print("Ошибка: такого статуса нет.")
+
+        elif choice == "6":
+            show_inheritance_demo()
 
         elif choice == "0":
             print("Выход из меню библиотекаря.")
