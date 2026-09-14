@@ -17,6 +17,9 @@ class Book:
             f"Статус: {self.status}"
         )
 
+    def show_format(self):
+        print("Тип книги: неизвестен")
+
 
 class PrintedBook(Book):
     def __init__(self, book_id, title, author, year, status, pages):
@@ -149,12 +152,60 @@ def show_inheritance_demo():
         book.show_format()
 
 
+def show_polymorphism_demo():
+    print("\n===== Демонстрация полиморфизма =====")
+
+    polymorphic_books = [
+        PrintedBook(
+            10,
+            "1984",
+            "Джордж Оруэлл",
+            1949,
+            "Доступна",
+            328
+        ),
+        ElectronicBook(
+            11,
+            "Гарри Поттер",
+            "Джоан Роулинг",
+            1997,
+            "Доступна",
+            "PDF"
+        ),
+        PrintedBook(
+            12,
+            "Анна Каренина",
+            "Лев Толстой",
+            1878,
+            "Выдана",
+            864
+        ),
+        ElectronicBook(
+            13,
+            "Три товарища",
+            "Эрих Мария Ремарк",
+            1936,
+            "Доступна",
+            "EPUB"
+        )
+    ]
+
+    print("\nОбъекты разных типов находятся в одной коллекции.")
+    print("Для всех объектов вызывается один и тот же метод show_format():\n")
+
+    for book in polymorphic_books:
+        print(f"Книга: {book.title}")
+        book.show_format()
+        print()
+
+
 def reader_menu():
     while True:
         print("\n===== Меню читателя =====")
         print("1. Показать каталог")
         print("2. Найти книгу")
         print("3. Показать типы книг")
+        print("4. Демонстрация полиморфизма")
         print("0. Выйти")
 
         choice = input("Выберите действие: ")
@@ -175,6 +226,9 @@ def reader_menu():
         elif choice == "3":
             show_inheritance_demo()
 
+        elif choice == "4":
+            show_polymorphism_demo()
+
         elif choice == "0":
             print("Выход из меню читателя.")
             break
@@ -192,6 +246,7 @@ def librarian_menu():
         print("4. Удалить книгу")
         print("5. Изменить статус книги")
         print("6. Показать типы книг")
+        print("7. Демонстрация полиморфизма")
         print("0. Выйти")
 
         choice = input("Выберите действие: ")
@@ -267,6 +322,9 @@ def librarian_menu():
 
         elif choice == "6":
             show_inheritance_demo()
+
+        elif choice == "7":
+            show_polymorphism_demo()
 
         elif choice == "0":
             print("Выход из меню библиотекаря.")
